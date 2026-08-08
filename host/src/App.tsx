@@ -1,6 +1,6 @@
 
 const App =()=>{
-    return <div>Hello from App</div>
+    return <div>Hello from Host App</div>
 }
 
 export default App;

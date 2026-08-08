@@ -1,30 +1,15 @@
 import path from "node:path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import { Configuration } from "webpack";
+import { merge } from "webpack-merge"
 
-export interface CommonConfigOptions {
-  /** Absolute path to the consuming app's root directory (pass `__dirname`). */
-  context: string;
-  /** Entry point relative to `context`. Defaults to `./src/index.tsx`. */
-  entry?: string;
-  /** Public HTML template relative to `context`. Defaults to `./public/index.html`. */
-  htmlTemplate?: string;
-}
 
-export function createCommonConfig(options: CommonConfigOptions): Configuration {
-  const {
-    context,
-    entry = "./src/index.tsx",
-    htmlTemplate = "./public/index.html",
-  } = options;
-
+export const createCommonConfig = async (uniqueName: string) => {
   return {
-    entry,
-
     output: {
-      path: path.resolve(context, "dist"),
-      filename: "[name].[contenthash].js",
+      path: path.resolve(process.cwd(), "build"),
       clean: true,
+      filename: "[name].[contenthash].js",
+      uniqueName
     },
 
     resolve: {
@@ -68,8 +53,34 @@ export function createCommonConfig(options: CommonConfigOptions): Configuration 
 
     plugins: [
       new HtmlWebpackPlugin({
-        template: htmlTemplate,
+        template: "./public/index.html",
       }),
     ],
   };
+}
+
+
+export const createDevelopmentConfig = async (uniqueName: string, config = {}) => {
+  return merge(
+    await createCommonConfig(uniqueName), {
+    mode: "development",
+    devtool: "inline-source-map",
+    devServer: {
+      static: "./dist",
+      historyApiFallback: true,
+      port: process.env.PORT,
+      client:{
+        overlay:false
+      }
+    }
+  }, config
+  )
+}
+
+export const createHostDevelopmentConfig = async (uniqueName: string, config = {})=>{
+  return merge(
+    await createDevelopmentConfig(uniqueName, {
+      //Todo: module federation plugin setup
+    }), config
+  )
 }
