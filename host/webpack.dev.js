@@ -1,3 +1,3 @@
-const { createHostDevelopmentConfig } = require('app-config')
+import { createHostDevelopmentConfig } from 'app-config'
 
-module.exports = createHostDevelopmentConfig(process.env.MODULE_NAME)
+export default createHostDevelopmentConfig(process.env.MODULE_NAME)
